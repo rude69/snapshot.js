@@ -8,6 +8,9 @@ import {
   Vote,
   Follow,
   Unfollow,
+  Subscribe,
+  Unsubscribe,
+  Profile,
   Alias,
   spaceTypes,
   proposalTypes,
@@ -20,7 +23,10 @@ import {
   voteArray2Types,
   voteString2Types,
   followTypes,
+  subscribeTypes,
   unfollowTypes,
+  unsubscribeTypes,
+  profileTypes,
   aliasTypes
 } from './types';
 import hubs from '../hubs.json';
@@ -42,12 +48,12 @@ export default class Client {
   }
 
   async sign(web3: Web3Provider | Wallet, address: string, message, types) {
+    // @ts-ignore
+    const signer = web3?.getSigner ? web3.getSigner() : web3;
     if (!message.from) message.from = address;
-    if (!message.timestamp) message.timestamp = ~~(Date.now() / 1e3);
+    if (!message.timestamp)
+      message.timestamp = parseInt((Date.now() / 1e3).toFixed());
     const data: any = { domain, types, message };
-    let signer;
-    if (web3 instanceof Wallet) signer = web3;
-    if (web3 instanceof Web3Provider) signer = web3.getSigner();
     const sig = await signer._signTypedData(domain, data.types, message);
     console.log('Sign', { address, sig, data });
     return await this.send({ address, sig, data });
@@ -73,16 +79,21 @@ export default class Client {
     });
   }
 
-  async space(web3: Web3Provider, address: string, message: Space) {
+  async space(web3: Web3Provider | Wallet, address: string, message: Space) {
     return await this.sign(web3, address, message, spaceTypes);
   }
 
-  async proposal(web3: Web3Provider, address: string, message: Proposal) {
+  async proposal(
+    web3: Web3Provider | Wallet,
+    address: string,
+    message: Proposal
+  ) {
+    if (!message.discussion) message.discussion = '';
     return await this.sign(web3, address, message, proposalTypes);
   }
 
   async cancelProposal(
-    web3: Web3Provider,
+    web3: Web3Provider | Wallet,
     address: string,
     message: CancelProposal
   ) {
@@ -95,7 +106,7 @@ export default class Client {
     );
   }
 
-  async vote(web3: Web3Provider, address: string, message: Vote) {
+  async vote(web3: Web3Provider | Wallet, address: string, message: Vote) {
     const type2 = message.proposal.startsWith('0x');
     let type = type2 ? vote2Types : voteTypes;
     if (['approval', 'ranked-choice'].includes(message.type))
@@ -109,15 +120,43 @@ export default class Client {
     return await this.sign(web3, address, message, type);
   }
 
-  async follow(web3: Wallet, address: string, message: Follow) {
+  async follow(web3: Web3Provider | Wallet, address: string, message: Follow) {
     return await this.sign(web3, address, message, followTypes);
   }
 
-  async unfollow(web3: Wallet, address: string, message: Unfollow) {
+  async unfollow(
+    web3: Web3Provider | Wallet,
+    address: string,
+    message: Unfollow
+  ) {
     return await this.sign(web3, address, message, unfollowTypes);
   }
 
-  async alias(web3: Web3Provider, address: string, message: Alias) {
+  async subscribe(
+    web3: Web3Provider | Wallet,
+    address: string,
+    message: Subscribe
+  ) {
+    return await this.sign(web3, address, message, subscribeTypes);
+  }
+
+  async unsubscribe(
+    web3: Web3Provider | Wallet,
+    address: string,
+    message: Unsubscribe
+  ) {
+    return await this.sign(web3, address, message, unsubscribeTypes);
+  }
+
+  async profile(
+    web3: Web3Provider | Wallet,
+    address: string,
+    message: Profile
+  ) {
+    return await this.sign(web3, address, message, profileTypes);
+  }
+
+  async alias(web3: Web3Provider | Wallet, address: string, message: Alias) {
     return await this.sign(web3, address, message, aliasTypes);
   }
 }

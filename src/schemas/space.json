@@ -45,7 +45,7 @@
         "website": {
           "type": "string",
           "title": "website",
-          "format": "uri",
+          "format": "url",
           "maxLength": 128
         },
         "twitter": {
@@ -75,7 +75,7 @@
           "type": "string",
           "title": "symbol",
           "minLength": 1,
-          "maxLength": 12
+          "maxLength": 16
         },
         "skin": {
           "type": "string",
@@ -99,6 +99,11 @@
                 "maxLength": 64,
                 "title": "name"
               },
+              "network": {
+                "type": "string",
+                "maxLength": 12,
+                "title": "network"
+              },
               "params": {
                 "type": "object",
                 "title": "params"
@@ -111,9 +116,10 @@
         },
         "members": {
           "type": "array",
+          "maxItems": 100,
           "items": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9]*$",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
             "minLength": 42,
             "maxLength": 42
           },
@@ -121,9 +127,10 @@
         },
         "admins": {
           "type": "array",
+          "maxItems": 100,
           "items": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9]*$",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
             "minLength": 42,
             "maxLength": 42
           },
@@ -171,6 +178,63 @@
         },
         "plugins": {
           "type": "object"
+        },
+        "voting": {
+          "type": "object",
+          "properties": {
+            "delay": {
+              "type": "number",
+              "minimum": 0
+            },
+            "period": {
+              "type": "number",
+              "minimum": 0
+            },
+            "type": {
+              "type": "string",
+              "title": "type"
+            },
+            "quorum": {
+              "type": "number",
+              "minimum": 0
+            },
+            "blind": {
+              "type": "boolean"
+            },
+            "hideAbstain": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "categories": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "enum": [
+              "protocol",
+              "social",
+              "investment",
+              "grant",
+              "service",
+              "media",
+              "creator",
+              "collector"
+            ]
+          }
+        },
+        "parent": {
+          "type": "string",
+          "title": "parent"
+        },
+        "children": {
+          "type": "array",
+          "maxItems": 8,
+          "title": "children",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": ["name", "network", "symbol", "strategies"],

@@ -1,11 +1,11 @@
+import Client712 from './sign';
 import Client from './client';
-import plugins from './plugins';
 import schemas from './schemas';
 import utils from './utils';
 
 export default {
   Client,
-  plugins,
+  Client712,
   schemas,
   utils
 };
